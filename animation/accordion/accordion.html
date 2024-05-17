@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>手风琴效果</title>
+  <style>
+    h3, ul, li {
+      padding: 0;
+      margin: 0;
+    }
+    
+    ul {
+      list-style: none;
+    }
+
+    h3 {
+      font-weight: normal;
+      font-size: 100%;
+    }
+
+    .menu-container {
+      width: 300px;
+      margin: 50px auto;
+      font-size: 14px;
+    }
+
+    .menu {
+      line-height: 30px;
+      margin-bottom: 20px;
+    }
+    .menu h3 {
+      background-color: lightblue;
+      padding: 0 10px;
+      cursor: pointer;
+    }
+
+    .submenu {
+      overflow: hidden;
+      background-color: rgb(220, 245, 253);
+      height: 0;
+    }
+
+    .submenu li {
+      padding: 0 14px;
+    }
+  </style>
+</head>
+<body>
+
+  <ul class="menu-container">
+    <li class="menu">
+      <h3>菜单1</h3>
+      <ul class="submenu">
+        <li>菜单</li>
+        <li>菜单</li>
+        <li>菜单</li>
+        <li>菜单</li>
+      </ul>
+    </li>
+    <li class="menu">
+      <h3>菜单2</h3>
+      <ul class="submenu">
+        <li>菜单</li>
+        <li>菜单</li>
+        <li>菜单</li>
+        <li>菜单</li>
+      </ul>
+    </li>
+    <li class="menu">
+      <h3>菜单3</h3>
+      <ul class="submenu">
+        <li>菜单</li>
+        <li>菜单</li>
+        <li>菜单</li>
+        <li>菜单</li>
+      </ul>
+    </li>
+    <li class="menu">
+      <h3>菜单4</h3>
+      <ul class="submenu">
+        <li>菜单</li>
+        <li>菜单</li>
+        <li>菜单</li>
+        <li>菜单</li>
+      </ul>
+    </li>
+  </ul>
+
+</body>
+</html>
+<script src="../index.js"></script>
+<script>
+var menus = document.querySelectorAll('.menu h3')
+menus = [].slice.call(menus, 0)
+menus.forEach(menu => {
+  
+  menu.onclick = function() {
+    // 有瑕疵：快速的点击多个菜单，这时候被点击的菜单会开始做动画，会导致有些菜单没办法被关闭。
+    var openedMenus = document.querySelectorAll(`[status="${Opened}"]`)
+    openedMenus = [].slice.call(openedMenus, 0)
+    console.log(openedMenus)
+    openedMenus.forEach(ele => {
+      closeMenu(ele)
+    })
+
+    var submenu = menu.nextElementSibling
+    toggleMenu(submenu)
+  }
+})
+
+
+
+var duration = 10
+var totalDuration = 200
+var itemHeight = 30
+var submenu = document.querySelector('.menu ul')
+var totalHeight = itemHeight * submenu.children.length
+
+const Playing = 'playing';
+const Closed = 'closed';
+const Opened = 'opened';
+
+function openMenu(submenu) {
+  var status = submenu.getAttribute('status')
+
+  // 只有closed状态才允许打开，也就是说处于opened、playing状态是不能打开的。
+  if (status && status !== Closed) {
+    return
+  }
+
+  submenu.setAttribute('status', Playing)
+
+  createAnimation({
+    from: 0,
+    to: totalHeight,
+    duration,
+    totalDuration,
+    onChange(value) {
+      submenu.style.height = value + 'px'
+    },
+    onCompleted() {
+      submenu.setAttribute('status', Opened)
+    }
+  })
+}
+
+function closeMenu(submenu) {
+  var status = submenu.getAttribute('status')
+
+  // 只有处于opened状态才允许关闭。
+  if (status !== Opened) {
+    return
+  }
+
+  submenu.setAttribute('status', Playing)
+
+  createAnimation({
+    from: totalHeight,
+    to: 0,
+    duration,
+    totalDuration,
+    onChange(value) {
+      submenu.style.height = value + 'px'
+    },
+    onCompleted() {
+      submenu.setAttribute('status', Closed)
+    }
+  })
+}
+
+function toggleMenu(submenu) {
+  var status = submenu.getAttribute('status')
+  if (Opened === status) {
+    closeMenu(submenu)
+  } else if (!status || Closed === status) {
+    openMenu(submenu)
+  }
+}
+// var ele = document.querySelector('ul li')
+// var itemHeight = ele.offsetHeight
+// var totalHeight = itemHeight * 4
+
+// function accordion(event) {
+//   var target = event.target
+//   var drawer = target && target.nextElementSibling
+
+//   createAnimation({
+//     from: 0,
+//     to: totalHeight,
+//     onChange(dis) {
+//       status = 
+//       drawer.style.height = dis + 'px'
+//     }
+//   })
+// }
+
+// var menu = document.querySelector('.menu h3')
+// menu.addEventListener('click', accordion)
+
+</script>

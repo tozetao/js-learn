@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JS运动</title>
+  <style>
+    body, ul, li, p {
+      margin: 0;
+      padding: 0;
+    }
+    .square {
+      display: inline-block;
+
+      width: 100px;
+      height: 100px;
+
+      background-color: burlywood;
+
+      position: absolute;
+      top: 0;
+      left: 500px;
+    }
+
+    .span {
+      display: inline-block;
+
+      height: 100px;
+      border-left: 1px solid #cdc;
+
+      margin-left: 300px;
+    }
+  </style>
+</head>
+<body>
+  <div class="square"></div>
+  <span class="span"></span>
+  <div>
+    <button id="go_btn">Click</button>
+  </div>
+</body>
+</html>
+<script src="../index.js"></script>
+<script>
+
+(function() {
+  var btn = $('button')
+  var square = $('div.square')
+  var timer = null
+  btn.onclick = function() {
+    move(square, 300)
+  }
+
+  // 速度是单位时间内移动的距离，speed是相对于间隔时间的速度。比如下面的例子，每个20毫秒移动多少距离。
+
+  // 加速度运动
+  function move(dom, target) {
+    clearInterval(timer)
+    timer = setInterval(function() {
+      // target - dom.offsetLeft的值小于10时，就开始-1-1-1，直至到目标点。
+      var speed = (target - dom.offsetLeft) / 10
+      speed = speed > 0 ? Math.ceil(speed) : Math.floor(speed)
+      console.log(dom.offsetLeft, (target - dom.offsetLeft) / 10, speed)
+
+      if (dom.offsetLeft == target) {
+        clearInterval(timer)
+      } else {
+        dom.style.left = (dom.offsetLeft + speed) + 'px'
+      }
+    }, 20)
+  }
+
+  // // 匀速运动
+  // function uniformMotion(dom, target) {
+       // 点击时，会清除之前的定时器，再开启另外一个定时器。保证了同时只有一个定时器在执行。
+  //   clearInterval(timer)
+  //   timer = setInterval(function() {
+  //     var speed = 4
+  //     speed = target - dom.offsetLeft > 0 ? speed : speed * -1
+
+         // start < target, 1,10  -4,3,  0,10, -5,-3
+         // start > target
+
+  //     if (Math.abs(target - dom.offsetLeft) < Math.abs(speed)) {
+  //       clearInterval(timer)
+  //       dom.style.left = target + 'px'
+  //     } else {
+  //       dom.style.left = (dom.offsetLeft + speed) + 'px'
+  //     }
+  //   }, 10)
+  // }
+
+})()
+
+// 上面的代码是保证同时只有一个定时器在运行。
+// 防抖动是延迟一定的时间后再执行操作，在延时的时间内如果多出触发相同的事件，会取消之前延迟的执行，重新开始即时。
+function debound(fn, duration) {
+  var timer = null
+  return function() {
+    clearTimeout(timer)
+    timer = setTimeout(function() {
+      fn()
+    }, duration)
+  }
+}
+
+// // // demo1
+// (function() {
+//     // 让正方形div移动到终点
+//     function move(start, end) {
+//     var square = $('div.square')
+    
+//     var totalDuration = 1000
+//     var duration = 12
+
+//     var times = Math.floor(totalDuration / duration)
+//     var speed = (end - start) / times
+
+//     console.log(speed, times)
+
+//     var cnt = 0
+
+//     var timer = setInterval(function() {
+//       var left = getComputedStyle(square, null).getPropertyValue('left')
+//       left = Number.parseFloat(left)
+
+//       var offset = left + speed
+
+//       if (cnt == times - 1) {
+//         clearInterval(timer)
+//         offset = end
+//       }
+//       console.log('cnt: %o, offset: %o', cnt, offset)
+
+//       square.style.left = offset + 'px'
+//       cnt++
+//     }, duration)
+//   }
+//   $('button').onclick = function(event) {
+//     move(0, 300)
+//   }
+// })()
+</script>

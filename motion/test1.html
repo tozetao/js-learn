@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    body {
+      padding: 0;
+      margin: 0;
+    }
+    .wrapper {
+      position: relative;
+      margin: 100px;
+      padding: 0;
+      list-style: none;
+    }
+    .wrapper li {
+      width: 198px;
+      height: 98px;
+
+      border: 1px solid #cdc;
+      background-color: aquamarine;
+
+      float: left;
+    }
+    .wrapper .bg {
+      position: absolute;
+      left: 0;
+      top: 0;
+      background-color: rgb(196, 163, 13);
+
+      z-index: 100;
+      width: 198px;
+      height: 98px;
+    }
+  </style>
+</head>
+<body>
+    <ul class="wrapper">
+        <li class="item">A</li>
+        <li class="item">B</li>
+        <li class="item">C</li>
+        <li class="item">D</li>
+        <li class="bg"></li>
+    </ul>
+</body>
+</html>
+<script>
+  var items = document.querySelectorAll('ul li')
+  var bgItem = items[items.length - 1]
+  console.log(items)
+
+  for (let i = 0; i < items.length - 1; i++) {
+    console.log(items[i])
+    items[i].onmouseenter = function() {
+      move(bgItem, this.offsetLeft)
+    }
+  }
+
+  function move(dom, target) {
+    clearInterval(dom.timer)
+
+    var speed = 0
+    var a = 0
+    dom.timer = setInterval(function() {
+      a = (target - dom.offsetLeft) / 7
+      speed += a
+      speed *= 0.8
+      console.log(speed, target - dom.offsetLeft)
+      if (Math.abs(speed) < 1 && Math.abs(target - dom.offsetLeft) < 1) {
+        clearInterval(dom.timer)
+      } else {
+        dom.style.left = dom.offsetLeft + speed + 'px'
+      }
+    }, 35)
+  }
+
+</script>

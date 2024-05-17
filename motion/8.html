@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>拖拽示例</title>
+  <style>
+    .box {
+      height: 100px;
+      width: 100px;
+      background-color: orange;
+      opacity: 0.5;
+
+      position: absolute;
+      left: 0;
+      top: 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="box"></div>
+
+  <button style="margin-top: 150px;">Click</button>
+
+  <div id="main" style="margin-left: 200px; height: 700px; width: 700px;"></div>
+</body>
+</html>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.common.min.js"></script>
+<script src="../index.js"></script>
+<script>
+  // var charts = getCharts()
+  // charts.init('main')
+
+  var box = document.querySelector('div.box')
+  box.onmousedown = function(e) {
+    clearInterval(box.timer)
+    var event = event || e
+
+    // 计算出鼠标点击时与容器之间的距离
+    var disX = event.clientX - this.offsetLeft
+    var disY = event.clientY - this.offsetTop
+    var self = this
+
+    var speedX = 0
+    var speedY = 0
+    var lastX = 0
+    var lastY = 0
+    
+    document.onmousemove = function(e) {
+      var event = event || e
+      
+      var left = event.clientX - disX
+      var top = event.clientY - disY
+
+      var span = document.createElement('span')
+      span.style.height = 4+'px'
+      span.style.width = 4+'px'
+      span.style.backgroundColor = 'black'
+      span.style.position = 'absolute'
+      span.style.left = left + 'px'
+      span.style.top = top + 'px'
+      document.body.appendChild(span)
+
+      speedX = left - lastX
+      speedY = top - lastY
+
+      lastX = left
+      lastY = top
+
+      self.style.left = left + 'px'
+      self.style.top = top + 'px'
+    }
+
+    document.onmouseup = function() {
+      document.onmouseup = null
+      document.onmousemove = null
+      move(box, speedX, speedY)
+    }
+  }
+
+  function move(dom, speedX, speedY) {
+    clearInterval(dom.timer)
+
+    var newTop = 0
+    var newLeft = 0
+    var a = 3
+
+    dom.timer = setInterval(function() {
+      speedY += a
+      
+      newTop = dom.offsetTop + speedY
+      newLeft = dom.offsetLeft + speedX
+
+      if (newLeft >= document.documentElement.clientWidth - dom.clientWidth) {
+        newLeft = document.documentElement.clientWidth - dom.clientWidth
+        speedX *= -1
+        speedX *= 0.8
+        speedY *= 0.8
+      }
+
+      if (newLeft <= 0) {
+        newLeft = 0
+        speedX *= -1
+        speedX *= 0.8
+        speedY *= 0.8
+      }
+
+      if (newTop >= document.documentElement.clientHeight - dom.clientHeight) {
+        newTop = document.documentElement.clientHeight - dom.clientHeight
+        speedY *= -1
+        speedY *= 0.8
+        speedX *= 0.8
+      }
+
+      if (newTop <= 0) {
+        newTop = 0
+        speedY *= -1
+        speedY *= 0.8
+        speedX *= 0.8
+      }
+
+      if (Math.abs(speedY) < 1) {
+        speedY = 0
+      }
+      if (Math.abs(speedX) < 1) {
+        speedX = 0
+      }
+
+      console.log(newTop, speedX, speedY)
+
+      if (speedY === 0 && speedX === 0 && newTop === (document.documentElement.clientHeight - dom.clientHeight)) {
+        clearInterval(dom.timer)
+      } else {
+        dom.style.top = newTop + 'px'
+        dom.style.left = newLeft + 'px'
+      }
+      
+    }, 30)
+  }
+  
+  
+</script>

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>透明度渐变</title>
+  <style>
+    .wrapper {
+      width: 100px;
+      height: 100px;
+      background-color: aqua;
+
+      opacity: 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper"></div>
+
+  <div>
+    <button>click</button>
+  </div>
+</body>
+</html>
+<script src="../index.js"></script>
+<script>
+  var button = $('button')
+  button.onclick = function() {
+    var wrapper = $('div.wrapper')
+    gradualChange(wrapper, 100)
+  }
+
+  
+
+  var timer = null
+  function gradualChange(dom, target) {
+    clearInterval(timer)
+
+    timer = setInterval(function() {
+      var opacity = parseFloat(getStyle(dom, 'opacity')) * 100
+      var speed = (target - opacity) / 7
+      speed = speed > 0 ? Math.ceil(speed) : Math.floor(speed)
+
+      if (opacity == target) {
+        clearInterval(timer)
+      } else {
+        dom.style.opacity = (opacity + speed) / 100
+      }
+    }, 150)
+  }
+</script>

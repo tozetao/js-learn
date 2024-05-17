@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>公告滚动条</title>
+  <style lang="text/css">
+    h3, ul, li {
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      background-color: rgb(140, 245, 248);
+      padding: 20px 0;
+    }
+
+    .container::after {
+      content: '';
+      display: block;
+      clear: both;
+      height: 0;
+    }
+
+    h3 {
+      float: left;
+
+      height: 30px;
+      line-height: 30px;
+
+      padding: 0 20px;
+      margin-right: 20px;
+      border-right: 2px solid #cdc;
+    }
+    ul {
+      height: 30px;
+      line-height: 30px;
+      font-size: 14px;
+      
+      float: left;
+      overflow: hidden scroll;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h3>系统公告</h3>
+    <ul>
+      <li>这是第一项</li>
+      <li>Dignissimos aut dolorum quod?</li>
+      <li>Aspernatur ut laudantium mollitia!</li>
+      <li>Totam qui ut consequuntur.</li>
+    </ul>
+  </div>
+</body>
+</html>
+<script>
+  // 动画：在一定时间内完成N次动作。比如电影每秒包含着24帧，所以在人眼中就形成连续的动画。
+(function() {
+  var list = document.querySelector('ul')
+
+  function cloneFirstItem() {
+    const item = list.firstElementChild.cloneNode(true)
+    list.appendChild(item)
+  }
+  cloneFirstItem()
+  
+  console.log(document.querySelectorAll('li'))
+
+  // const v1 = [].slice.call(list)
+  // console.log(v1)
+
+  var height = 30
+  var index = 0
+  
+  // 变化的总时间
+  var totalDuration = 500
+
+  // 变化的间隔时间
+  var duration = 20
+
+  function moveNext() {
+    var from = index * height
+    var to = from + height
+
+    var totalTimes = totalDuration / duration
+    var speed = height / totalTimes
+
+    var timer = null
+
+    timer = setInterval(function() {
+      from += speed
+
+      if (from >= to) {
+        clearInterval(timer)
+        index++
+        if (index == (list.childElementCount - 1)) {
+          index = 0
+          from = 0
+        }
+      }
+
+      list.scrollTop = from
+    }, duration)
+  }
+
+  setInterval(moveNext, 2000);
+})()
+</script>

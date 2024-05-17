@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test</title>
+</head>
+<body>
+  
+</body>
+</html>
+<script>
+// console.log(1)
+
+// function getData() {
+//   return new Promise((resolve, reject) => {
+//     console.log('getData')
+
+//     let xhr = new XMLHttpRequest()
+//     xhr.open('get', 'http://localhost/demo.php', false)
+//     xhr.send();
+//     resolve({
+//       status: xhr.status,
+//       statusText: xhr.statusText,
+//       response: xhr.response
+//     })
+
+//     // let xhr = new XMLHttpRequest()
+//     // xhr.open('get', 'http://localhost/demo.php')
+//     // xhr.onload = function(e) {
+//     //   if (xhr.readyState === 4) {
+//     //     if (xhr.status === 200) {
+//     //       resolve({
+//     //         status: xhr.status,
+//     //         statusText: xhr.statusText,
+//     //         response: xhr.response
+//     //       })      
+//     //     } else {
+//     //       reject({
+//     //         error: 1,
+//     //         response: xhr.responseText
+//     //       })
+//     //     }
+//     //   }
+//     // }
+//     // xhr.send()
+//   })
+// }
+
+// async function foo() {
+//   const response = await getData()
+//   console.log(response)
+// }
+
+// foo()
+// console.log(2)
+
+async function async1() {
+  console.log('async1 start')
+  await async2()
+  console.log('async1 end')
+}
+
+async function async2() {
+  console.log('async2')
+}
+
+console.log('script start')
+
+setTimeout(function() {
+  console.log('setTimeout')
+}, 0)
+
+async1()
+
+new Promise(function(resolve) {
+  console.log('promise1')
+  resolve()
+}).then(function() {
+  console.log('promise2')
+})
+
+console.log('script end')
+
+</script> 

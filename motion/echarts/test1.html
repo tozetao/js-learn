@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>直角坐标系</title>
+</head>
+<body>
+  <div id="main" style="width: 1200px; height: 700px;"></div>
+</body>
+</html>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.common.min.js"></script>
+<script type="text/javascript">
+  var myChart = {
+    chart: null,
+    init(id) {
+      this.chart = echarts.init(document.getElementById(id));
+      var xMin = -30
+      var xMax = 30
+      var xInterval = (xMax - xMin) / 40
+      
+      var yMin = -2000
+      var yMax = 2000
+      var yInterval = (yMax - yMin) / 40
+      
+      var option = {
+        xAxis: {
+          type: 'value',
+          name: 'x',
+          min: xMin,
+          max: xMax,
+          interval: xInterval
+        },
+        yAxis: {
+          type: 'value',
+          name: 'x',
+          min: yMin,
+          max: yMax,
+          interval: yInterval
+        },
+        dataset: {
+          source: []
+        },
+        series: [
+          {
+            name: 'y=x/k',
+            type: 'line',
+            smooth: true
+          }
+        ]
+      }
+      this.chart.setOption(option)
+    },
+    setDataSource(source) {
+      this.chart.setOption({
+        dataset: {
+          source: [...source]
+        }
+      })
+    }
+  }
+  const source = []
+  for (let i = 0; i < 20; i++) {
+    source.push([i, i * Math.ceil(Math.random() * 100)])  
+  }
+  myChart.init()
+  myChart.setDataSource(source)
+</script>

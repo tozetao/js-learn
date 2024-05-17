@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>碰撞检测</title>
+  <link rel="stylesheet" href="../reset.css">
+  <style>
+    .lead {
+      width: 100px;
+      height: 100px;
+
+      background-color: bisque;
+      position: absolute;
+      left: 0;
+      top: 0;
+    }
+
+    .target {
+      width: 200px;
+      height: 150px;
+
+      background-color: aqua;
+
+      margin: 300px;
+    }
+  </style>
+</head>
+<body>
+  <div class="lead"></div>
+  <div class="target"></div>
+</body>
+</html>
+<script>
+  const targetBox = document.querySelector('div.target')
+
+  const leadBox = document.querySelector('div.lead')
+  leadBox.onmousedown = function(event) {
+    const xDis = event.clientX - this.offsetLeft
+    const yDis = event.clientY - this.offsetTop
+
+    document.onmousemove = function(event) {
+      // event.offsetX: 以当前事件的目标对象左上角为原点，定位x轴坐标。event.clientX，以浏览器视窗左上角为原点，定位x轴坐标。
+      const left = event.clientX - xDis
+      const right = event.clientY - yDis
+
+      leadBox.style.left = left + 'px'
+      leadBox.style.top = right + 'px'
+
+      console.log(isColliding(leadBox, targetBox))
+    }
+  }
+
+  leadBox.onmouseup = function() {
+    document.onmousemove = null
+  }
+
+  function isColliding(dom1, dom2) {
+    const dom1CenterX = dom1.offsetLeft + (dom1.clientWidth / 2)
+    const dom1CenterY = dom1.offsetTop + (dom1.clientHeight / 2)
+    const dom2CenterX = dom2.offsetLeft + (dom2.clientWidth / 2)
+    const dom2CenterY = dom2.offsetTop + (dom2.clientHeight / 2)
+
+    const disX = Math.abs(dom1CenterX - dom2CenterX)
+    const disY = Math.abs(dom1CenterY - dom2CenterY)
+    return disX < (dom1.clientWidth + dom2.clientWidth) / 2 && disY < (dom2.clientHeight + dom1.clientHeight) / 2
+  }
+
+</script>

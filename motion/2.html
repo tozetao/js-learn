@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>侧边栏弹出层</title>
+  <style>
+    body, ul, li, image {
+      margin: 0;
+      padding: 0;
+    }
+
+    .wrapper {
+      width: 400px;
+      height: 80px;
+
+      position: absolute;
+      left: -400px;
+      top: 100px;
+
+      background-color: rgb(253, 175, 74);
+    }
+
+    .wrapper span {
+      width: 20px;
+      height: 80px;
+
+      position: absolute;
+      right: -20px;
+      top: 0;
+
+      background-color: rgb(255, 233, 205);
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <span></span>
+  </div>
+</body>
+</html>
+<script src="../index.js"></script>
+<script>
+  var timer = null
+
+  function move(dom, target) {
+    clearInterval(timer)
+    timer = setInterval(function() {
+      // target - dom.offsetLeft的值小于10时，就开始-1-1-1，直至到目标点。
+      var speed = (target - dom.offsetLeft) / 10
+      speed = speed > 0 ? Math.ceil(speed) : Math.floor(speed)
+
+      // 只需要关注speed和opacity俩个变量。
+      // speed是速度，它是 speed = (x1 - x2) / 7 的函数值，我们希望元素某个属性值由大变小，因此这个函数值也是由大变小的趋势
+      // x1-x2 > 0, x1>x2, 且当x1是一个常数时，随着x2的增大，且x2解禁x1的值时，speed的值在减小，且趋近于0。
+      // example: x1=0, x2=-400
+
+      // x1-x2<0, x1<x2, 当x1是一个常数时，随着x2由大变小，且x2接近于x1，也就是x1-x2的值在慢慢变大，那么speed的值也会增大，最后也是趋近与0。
+      // x1=-400, x2=0, 
+      console.log(dom.offsetLeft, (target - dom.offsetLeft) / 10)
+
+      if (dom.offsetLeft == target) {
+        clearInterval(timer)
+      } else {
+        dom.style.left = (dom.offsetLeft + speed) + 'px'
+      }
+    }, 20)
+  }
+
+  var wrapper = $('div.wrapper')
+  wrapper.onmouseenter = function() {
+    move(this, 0)
+  }
+  wrapper.onmouseleave = function() {
+    move(this, -400)
+  }
+
+  // var span = $('div.wrapper span')
+  // span.onclick = function() {
+  //   console.log('span click')
+  // }
+</script>

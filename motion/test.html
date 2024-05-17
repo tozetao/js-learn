@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    body {
+      padding: 0;
+      margin: 0;
+    }
+    .box {
+      position: absolute;
+      left: 0;
+      top: 0;
+      background-color: antiquewhite;
+
+      width: 100px;
+      height: 100px;
+    }
+    .span {
+      border-left: 2px solid black;
+      
+      position: absolute;
+      left: 300px;
+      top: 0;
+
+      height: 100px;
+    }
+  </style>
+</head>
+<body>
+  <div class="box"></div>
+  <span class="span"></span>
+</body>
+</html>
+<script>
+  var box = document.querySelector('div.box')
+  box.onclick = function() {
+    move(this, 300)
+  }
+
+  function move(dom, target) {
+    clearInterval(dom.timer)
+
+    var speed = 0
+    var a = 0
+    dom.timer = setInterval(function() {
+      // target>offsetLeft, a由大变小; target<offsetLeft, a由大变小
+      
+      a = (target - dom.offsetLeft) / 7
+      speed += a
+      speed *= 0.8
+      console.log(speed, target - dom.offsetLeft)
+      if (Math.abs(speed) < 1 && Math.abs(target - dom.offsetLeft) < 1) {
+        clearInterval(dom.timer)
+      } else {
+        dom.style.left = dom.offsetLeft + speed + 'px'
+      }
+    }, 35)
+  }
+
+  // speed是正数时，speed逐渐增大，容器到达target speed达到最大值。接着speed会开始减小，但是容器会始终一直向右偏移，直到speed < 0。
+  // speed是负数时，speed会逐渐变小，容器到达target时，speed达到最小值。接着speed会开始变大(值还是负的)，直到speed>0
+  // function move(dom, target) {
+  //   clearInterval(dom.timer)
+  //   var speed = 0
+  //   var a = 3
+  //   dom.timer = setInterval(function() {
+  //     if (dom.offsetLeft < target) {
+  //       speed += a
+  //     } else {
+  //       speed -= a
+  //     }
+  //     console.log(dom.offsetLeft, speed)
+
+  //     dom.style.left = (dom.offsetLeft + speed) + 'px'
+  //   }, 30)
+  // }
+
+</script>

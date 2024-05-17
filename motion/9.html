@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>轮播图片</title>
+  <style>
+    body, ul, li {
+      padding: 0;
+      margin: 0;
+    }
+
+    .carousel {
+      width: 400px;
+      height: 250px;
+
+      border: 1px solid #cdc;
+      margin: 100px auto;
+
+      overflow: hidden;
+      position: relative;
+    }
+    
+    .carousel ul {
+      height: 200px;
+      width: 1600px;
+      list-style: none;
+      font-size: 0;
+
+      position: absolute;
+      left: 0;
+      top: 0;
+    }
+
+    .carousel_item {
+      width: 400px;
+      height: 250px;
+
+      display: inline-block;
+      margin: 0;
+      padding: 0;
+
+      background-color: rgb(141, 168, 98);
+
+      font-size: 16px;
+      font-weight: bold;
+    }
+
+    .left-btn, .right-btn {
+      width: 50px;
+      height: 50px;
+
+      margin-top: -25px;
+
+      font-size: 18px;
+      border-radius: 50px;
+
+      position: absolute;
+      background-color: rgb(255, 212, 212);
+      z-index: 100;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .left-btn {
+      left: 14px;
+      top: 50%;
+    }
+    .right-btn {
+      right: 14px;
+      top: 50%;
+    }
+    .left-btn:hover, .right-btn:hover {
+      cursor: pointer;
+    }
+
+    .bg1 {
+      background-color: cadetblue;
+    }
+    .bg2 {
+      background-color: aqua;
+    }
+    .bg3 {
+      background-color: blueviolet;
+    }
+    .bg4 {
+      background-color: yellowgreen;
+    }
+
+    .spans {
+      position: absolute;
+      bottom: 5px;
+      text-align: center;
+      width: 100%;
+    }
+    .spans span {
+      display: inline-block;
+      margin-left: 4px;
+      width: 10px;
+      height: 10px;
+
+      background-color: black;
+    }
+    .spans span.active {
+      background-color: yellow;
+    }
+    
+  </style>
+</head>
+<body>
+  <div class="carousel">
+    <ul>
+      <li class="carousel_item">A</li>
+      <li class="carousel_item bg1">B</li>
+      <li class="carousel_item bg2">C</li>
+      <li class="carousel_item bg3">D</li>
+    </ul>
+    <div class="left-btn"><</div>
+    <div class="right-btn">></div>
+    <div class="spans">
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+  </div>
+</body>
+</html>
+<script src="./index.js"></script>
+<script>
+  var dom = $('div.carousel ul')
+  var moveWidth = dom.children[0].clientWidth
+
+  // 复制第一个节点
+  var cloneItem = dom.children[0].cloneNode(true)
+  cloneItem.innerText = 'A copy'
+  dom.appendChild(cloneItem)
+  dom.style.width = dom.children.length * moveWidth + 'px'
+
+  var length = dom.children.length
+
+
+  var leftBtn = $('div.left-btn')
+  leftBtn.onclick = function() {
+    switchImages(ToLeft, dom)
+  }
+
+  var rightBtn = $('div.right-btn')
+  rightBtn.onclick = function() {
+    switchImages(ToRight, dom)
+  }
+
+  let doing = false
+
+  // 向左滑动：0 -400, -400 -800, -800 -1200, -1200 -1800
+  // 向右滑动：-1600 -1200, -1200 -800, -800 -400, -400 0
+
+  const ToLeft = 1
+  const ToRight = 2
+  var resetPoint = (length - 1) * moveWidth * -1
+
+  function switchImages(direction, dom) {
+    if (doing) {
+      return
+    }
+    
+    doing = true
+    clearTimeout(timer)
+    if (direction == ToRight) {
+      if (dom.offsetLeft - moveWidth === resetPoint) {
+        index = 0
+      } else {
+        ++index
+      }
+      changeIndex(index)
+
+      move(dom, { left: dom.offsetLeft - moveWidth }, function() {
+        if (dom.offsetLeft == resetPoint) {
+          dom.style.left = '0px'
+        }
+        
+        doing = false
+        timer = setTimeout(function() {
+          switchImages(ToRight, dom)
+        }, 1000)
+      })
+    } else {
+      if (dom.offsetLeft === 0) {
+        dom.style.left = resetPoint + 'px'
+        index = length - 2
+      } else {
+        --index
+      }
+      changeIndex(index)
+
+      move(dom, { left: dom.offsetLeft + moveWidth }, function() {
+        doing = false
+        timer = setTimeout(function() {
+          switchImages(ToRight, dom)
+        }, 1000)
+      })
+    }
+  }
+  
+  var index = 0
+  var spanArray = document.querySelector('div.spans').getElementsByTagName('span')
+  spanArray = [].slice.call(spanArray, 0)
+  function changeIndex(index) {
+    spanArray.forEach(element => {
+      element.className = ''
+    })
+    spanArray[index].className = 'active'
+  }
+  changeIndex(0)
+
+  for (let i = 0; i < spanArray.length; i++) {
+    (function(i) {
+      
+      spanArray[i].onclick = function() {
+        console.log(i)
+        doing = true
+        clearTimeout(timer)
+        changeIndex(i)
+        console.log(-i * moveWidth)
+        move(dom, { left: -i * moveWidth }, function() {
+          doing = false
+          timer = setTimeout(function() {
+            switchImages(ToRight, dom)
+          }, 2000)
+        })
+      }
+    })(i)
+  }
+
+  var timer = null
+  timer = setTimeout(function() {
+    switchImages(ToRight, dom)
+  }, 2000)
+</script>

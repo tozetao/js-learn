@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>弹性运动</title>
+  <style>
+    body, ul, li, p {
+      margin: 0;
+      padding: 0;
+    }
+    .square {
+      display: inline-block;
+
+      width: 100px;
+      height: 100px;
+
+      background-color: burlywood;
+
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+
+    .span {
+      display: inline-block;
+
+      height: 100px;
+      border-left: 1px solid #cdc;
+
+      margin-left: 300px;
+    }
+  </style>
+</head>
+<body>
+  <div class="square"></div>
+  <span class="span"></span>
+  <div>
+    <button id="go_btn">Click</button>
+  </div>
+  <div id="main" style="width: 1000px; height: 700px; margin: 20px;"></div>
+</body>
+</html>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.common.min.js"></script>
+<script src="../index.js"></script>
+<script>
+
+(function() {
+  var myChart = {
+    chart: null,
+    init() {
+      this.chart = echarts.init(document.getElementById('main'));
+      var xMin = -100
+      var xMax = 300
+      var xInterval = (xMax - xMin) / 40
+      
+      var yMin = -200
+      var yMax = 200
+      var yInterval = (yMax - yMin) / 40
+      
+      var option = {
+        xAxis: {
+          type: 'value',
+          name: 'x',
+          min: xMin,
+          max: xMax,
+          interval: xInterval
+        },
+        yAxis: {
+          type: 'value',
+          name: 'x',
+          min: yMin,
+          max: yMax,
+          interval: yInterval
+        },
+        dataset: {
+          source: []
+        },
+        series: [
+          {
+            name: 'y=x/k',
+            type: 'line',
+            smooth: true
+          }
+        ]
+      }
+      this.chart.setOption(option)
+    },
+    setDataSource(source) {
+      this.chart.setOption({
+        dataset: {
+          source: [...source]
+        }
+      })
+    }
+  }
+  myChart.init()
+
+  var btn = $('button')
+  var square = $('div.square')
+  var timer = null
+  btn.onclick = function() {
+    move(square, 300)
+  }
+
+  var source = []
+
+  function move(dom, target) {
+    clearInterval(dom.timer)
+    
+    var a = 0
+    var speed = 0
+    var u = 0.8
+    var cnt = 0
+    dom.timer = setInterval(function() {
+      a = (target - dom.offsetLeft) / 7
+      speed += a
+      speed *= u
+      // source.push([dom.offsetLeft, a])
+      // console.log(dom.offsetLeft, a)
+
+      // 绘制的图像类似一个周期函数图像，向右滑动使用y轴的正半轴，向左滑动使用的y轴的负半轴
+      // source.push([cnt++, speed])
+      // console.log(speed)
+
+      // source.push([cnt++, speed])
+
+      if (Math.abs(speed) < 1 && Math.abs(target - dom.offsetLeft) < 1) {
+        clearInterval(dom.timer)
+      } else {
+        dom.style.left = dom.offsetLeft + speed + 'px' 
+      }
+    }, 30)
+  }
+
+})()
+
+</script>

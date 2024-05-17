@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>像素鸟</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <div class="container">
+    <div class="sky"></div>
+    <div class="land"></div>
+    <div class="bird bird3" id="bird"></div>
+
+    <!-- <div class="pipe-up"></div>
+    <div class="pipe-down"></div> -->
+  </div>
+</body>
+</html>
+<script src="../index.js"></script>
+<script>
+// 单次移动距离
+// 间隔时间
+// 俩者有什么关系?
+// 总时间 / 间隔时间 = 移动次数。
+// 单次移动距离 * 移动次数 = 总距离。
+// 为了能够形成动画，一般需要在1秒内发生多个动作，比如1秒内发生24个动作，以此形成动画。
+
+class Sky {
+  constructor(dom, xSpeed, ySpeed) {
+    this.dom = dom
+    this.xSpeed = xSpeed
+    this.ySpeed = ySpeed
+  }
+
+  beforeMove() {
+    if (Math.abs(this.dom.offsetLeft) >= this.dom.clientWidth/2) {
+      this.dom.style.left = 0
+    }
+  }
+
+  // 在这里，速度是每秒移动100px，为了形成动画，1秒内至少需要有24帧（次），也就是说需要每间隔大概42ms移动一次。那么duration的值就是42
+  move(duration) {
+    this.beforeMove()
+    const xDis = this.xSpeed * duration
+    this.dom.style.left = this.dom.offsetLeft + xDis + 'px'
+  }
+}
+
+class Land {
+  constructor(dom, xSpeed, ySpeed) {
+    this.dom = dom
+    this.xSpeed = xSpeed
+    this.ySpeed = ySpeed
+  }
+
+  beforeMove() {
+    if (Math.abs(this.dom.offsetLeft) >= this.dom.clientWidth/2) {
+      this.dom.style.left = 0
+    }
+  }
+
+  move(duration) {
+    this.beforeMove()
+    const xDis = this.xSpeed * duration
+    this.dom.style.left = this.dom.offsetLeft + xDis + 'px'
+  }
+}
+
+class Bird {
+  constructor(dom, xSpeed, ySpeed) {
+    this.dom = dom
+    this.xSpeed = xSpeed
+    this.ySpeed = ySpeed
+    this.g = 0.08
+
+    this.width = this.dom.clientWidth
+    this.height = this.dom.clientHeight
+
+    this.criticalValue = $('div.container').clientHeight - this.height - $('div.land').clientHeight
+
+    this.flyTimer = null
+    this.flyStatus = 0
+  }
+
+  move(duration) {
+    this.ySpeed *= 1 + this.g
+    const yDis = this.ySpeed * duration
+    const value = parseFloat(this.dom.offsetTop) + yDis
+
+    if (value - this.criticalValue > 0) {
+      this.dom.style.top = this.criticalValue + 4 + 'px'
+      this.clearTimer()
+    } else {
+      this.dom.style.top = value + 'px'
+    }
+  }
+
+  fly() {
+    if (this.flyTimer) {
+      return
+    }
+    this.flyTimer = setInterval(() => {
+      this.flyStatus = (this.flyStatus % 3) + 1
+      this.dom.className = 'bird bird' + this.flyStatus
+    }, 300)
+  }
+
+  stopFly() {
+    clearInterval(this.flyTimer)
+  }
+
+  clearTimer() {
+    clearInterval(this.timer)
+  }
+
+  // start() {
+  //   const duration = 15
+  //   this.timer = setInterval(() => {
+  //     this.move(duration / 1000)
+  //   }, duration)
+  // }
+}
+
+/*
+  每个柱子相隔的距离是固定150px。
+  
+  柱子是成对出现，需要跟着大地一起移动，也就是每隔一定时间也需要移动。
+
+  随着移动会超出容器，这是需要废弃掉。
+
+  高度需要随机生成
+*/
+class Pipe {
+  // Pipe的速度应该与大地保持一致
+  constructor(dom, height, xSpeed) {
+    this.dom = dom
+    this.xSpeed = xSpeed
+    this.dom.style.height = height + 'px'
+
+    this.dom.style.left = $('div.container').clientWidth + 'px'
+  }
+
+  get end() {
+    this.left = this.dom.offsetLeft
+    this.width = this.dom.clientWidth
+    return this.dom.offsetLeft <= -this.dom.clientWidth
+  }
+
+  move(duration) {
+    if (this.end) {
+      this.dom.remove()
+    } else {
+      const xDis = this.xSpeed * duration
+      this.dom.style.left = this.dom.offsetLeft + xDis + 'px'
+    }
+  }
+}
+
+function randomInt(min, max) {
+  return Math.floor(Math.random() * (max - min) + min)
+}
+
+class PipePair {
+  // 成对生成Pipe
+  constructor(xSpeed) {
+    const spacing = 150
+    const minHeight = 80
+
+    const container = $('div.container')
+
+    // 容器高度 - 大地高度 - 固定空格
+    const maxHeight = container.clientHeight - $('div.land').clientHeight - spacing
+
+    const downHeight = randomInt(minHeight, maxHeight - minHeight)
+    const upHeight = maxHeight - downHeight
+
+    const pipeDownDom = document.createElement('div')
+    pipeDownDom.className = 'pipe-down'
+    this.pipeDown = new Pipe(pipeDownDom, downHeight, xSpeed)
+    
+    const pipeUpDom = document.createElement('div')
+    pipeUpDom.className = 'pipe-up'
+    this.pipeUp = new Pipe(pipeUpDom, upHeight, xSpeed)
+
+    container.appendChild(pipeUpDom)
+    container.appendChild(pipeDownDom)
+  }
+
+  end() {
+    return this.pipeDown.end
+  }
+
+  move(duration) {
+    this.pipeDown.move(duration)
+    this.pipeUp.move(duration)
+  }
+}
+
+class PipePairProducer {
+  // 产生PipePair
+  constructor(xSpeed, tick) {
+    this.pipePairs = []
+    this.xSpeed = xSpeed
+    this.tick = tick
+  }
+
+  begin() {
+    if (this.timer) {
+      return
+    }
+    this.timer = setInterval(() => {
+      this.pipePairs.push(new PipePair(this.xSpeed))
+      console.log(this.pipePairs)
+
+      for (let i = 0; i < this.pipePairs.length; i++) {
+        const element = this.pipePairs[i]
+        console.log(element.end())
+        if (element.end()) {
+          this.pipePairs.splice(i, 1)
+          i--
+        }
+      }
+    }, this.tick)
+  }
+
+  end() {
+    clearInterval(this.timer)
+    this.timer = null
+  }
+}
+
+class Game {
+  constructor() {
+    this.producer = new PipePairProducer(-100, 1500)
+    this.bird = new Bird($('#bird'), 0, 100)
+
+    this.sky = new Sky($('div.sky'), -100, 0)
+    this.land = new Land($('div.land'), -80, 0)
+  }
+
+  start() {
+    if (this.timer) {
+      return
+    }
+
+    const duration = 16
+    this.timer = setInterval(() => {
+      const moveDuration = duration / 1000
+      this.sky.move(moveDuration)
+      this.land.move(moveDuration)
+      this.bird.move(moveDuration)
+
+      for (let i = 0; i < this.producer.pipePairs.length; i++) {
+        const pipePair = this.producer.pipePairs[i]
+        pipePair.move(moveDuration)
+      }
+    }, duration)
+
+    
+    this.bird.fly()
+    this.producer.begin()
+  }
+
+  stop() {
+    clearInterval(this.timer)
+    this.timer = null
+    this.bird.stopFly()
+    this.producer.end()
+  }
+}
+
+var game = new Game()
+game.start()
+
+</script>
